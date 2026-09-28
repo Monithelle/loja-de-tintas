@@ -1214,6 +1214,25 @@ p {
 }
 
 
+/* Fundo sólido para o texto ficar legível mesmo quando a
+   tinta que escorre atrás passa por trás desta seção. */
+.calculator-copy {
+
+  position: relative;
+
+  z-index: 1;
+
+  padding: 32px;
+
+  border-radius: var(--radius-lg);
+
+  background: rgba(247, 245, 239, .92);
+
+  backdrop-filter: blur(6px);
+
+}
+
+
 .calculator-note {
 
   margin-top: 28px;
@@ -2102,6 +2121,10 @@ main,
 
   .color-canvas {
     min-height: 270px;
+  }
+
+  .calculator-copy {
+    padding: 22px;
   }
 
   .category-grid,

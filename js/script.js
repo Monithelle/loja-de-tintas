@@ -298,6 +298,16 @@ if (paintCalculator && calculatorResult) {
 
   let currentProgress = 0;
   let targetProgress = 0;
+  let lastFrameTime = null;
+
+  /*
+    Tempo (em ms) que a tinta leva para "alcançar" a posição
+    real do scroll. Menor = mais fluido/ágil, maior = mais lento.
+    Usar tempo decorrido (em vez de um fator fixo por frame)
+    garante a mesma sensação de fluidez em qualquer taxa de
+    atualização de tela (60Hz, 120Hz, 144Hz...).
+  */
+  const CATCH_UP_MS = 160;
 
   const WIDTH = 1440;
   const HEIGHT = 1000;
@@ -444,8 +454,24 @@ if (paintCalculator && calculatorResult) {
       A interpolação dá inércia ao movimento.
       Assim a tinta acompanha o scroll suavemente,
       sem pular junto com a rodinha do mouse.
+
+      O fator de suavização agora usa o tempo decorrido
+      entre frames (dt) em vez de uma constante fixa, então
+      a velocidade percebida não muda com a taxa de atualização
+      da tela. O dt é limitado a 64ms para evitar um "salto"
+      da tinta quando o usuário volta para a aba depois de um
+      tempo (ex.: trocou de aba e o navegador pausou os frames).
     */
-    const ease = reduceMotion ? 1 : 0.065;
+    if (lastFrameTime === null) {
+      lastFrameTime = time;
+    }
+
+    const dt = Math.min(64, time - lastFrameTime);
+    lastFrameTime = time;
+
+    const ease = reduceMotion
+      ? 1
+      : 1 - Math.exp(-dt / CATCH_UP_MS);
 
     currentProgress +=
       (targetProgress - currentProgress) *
